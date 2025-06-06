@@ -1,19 +1,22 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CartItemType } from '@/apis/cartItems/cartItem.type';
+import { CartItemType } from '@entities/cart/type/cartItem.type';
+import { ROUTES } from '@shared/config/routes';
 
 interface OrderSuccessState {
-  orderList: CartItemType[];
-  paymentAmount: number;
+  orderItems: CartItemType[];
+  orderTotalPrice: number;
 }
-
-type RouteState = OrderSuccessState | undefined;
 
 export const usePageNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const navigateTo = <T extends RouteState>(route: string, state?: T) => {
-    navigate(route, state ? { state } : undefined);
+  const navigateToOrderSuccess = (state: OrderSuccessState) => {
+    navigate(ROUTES.ORDER_SUCCESS, { state });
+  };
+
+  const navigateToCart = () => {
+    navigate(ROUTES.CART);
   };
 
   const validateOrderSuccessState = (): OrderSuccessState | null => {
@@ -21,9 +24,9 @@ export const usePageNavigation = () => {
 
     const state = location.state as OrderSuccessState;
     if (
-      !state.orderList ||
-      !Array.isArray(state.orderList) ||
-      typeof state.paymentAmount !== 'number'
+      !state.orderItems ||
+      !Array.isArray(state.orderItems) ||
+      typeof state.orderTotalPrice !== 'number'
     ) {
       return null;
     }
@@ -32,7 +35,8 @@ export const usePageNavigation = () => {
   };
 
   return {
-    navigateTo,
+    navigateToOrderSuccess,
+    navigateToCart,
     validateOrderSuccessState,
   };
 };
